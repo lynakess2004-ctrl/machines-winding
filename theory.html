@@ -1,0 +1,2085 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <a href="index.html" style="color: #fff; text-decoration: none; font-weight: 600;">
+    ← Back to home
+</a>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bobinage Triphasé Double Couche - Interactive</title>
+    <style>
+        :root {
+            --color-primary: #9D4EDD;
+            --color-primary-dark: #7B2CBF;
+            --color-success: #A78BFA;
+            --color-warning: #E879F9;
+            --color-error: #FF1493;
+            --color-bg: #0A0E27;
+            --color-surface: #1A1F3A;
+            --color-text: #E8F4F8;
+            --color-text-secondary: #D8C5FF;
+            --color-border: #9D4EDD;
+            --color-phase-a: #E879F9;
+            --color-phase-b: #A78BFA;
+            --color-phase-c: #FF1493;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --glow: 0 0 20px rgba(157, 78, 221, 0.5);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--color-bg);
+            color: var(--color-text);
+            line-height: 1.6;
+        }
+
+        /* ===== NAVIGATION ===== */
+        nav {
+            position: sticky;
+            top: 0;
+            background: rgba(26, 31, 58, 0.95);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 30px rgba(0, 212, 255, 0.2), 0 2px 8px rgba(0,0,0,0.3);
+            z-index: 1000;
+            padding: 0 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            height: 60px;
+            animation: slideDown 0.5s ease-out;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to { transform: translateY(0); }
+        }
+
+        nav .logo {
+            font-weight: bold;
+            font-size: 18px;
+            color: var(--color-primary);
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            overflow-x: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        nav ul::-webkit-scrollbar {
+            display: none;
+        }
+
+        nav a {
+            text-decoration: none;
+            color: var(--color-text-secondary);
+            font-weight: 500;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 8px 12px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+
+        nav a:hover {
+            color: var(--color-primary);
+            background: rgba(33, 150, 243, 0.1);
+        }
+
+        /* ===== HERO SECTION ===== */
+        .hero {
+            position: relative;
+            min-height: 85vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(circle at 30% 40%, rgba(157, 78, 221, 0.25) 0%, transparent 60%),
+                        radial-gradient(circle at 70% 70%, rgba(232, 121, 249, 0.2) 0%, transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .hero h1, .hero p, .hero .btn {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero h1 {
+            font-size: 4em;
+            margin-bottom: 20px;
+            font-weight: 800;
+            color: white;
+            text-shadow: 0 0 20px rgba(157, 78, 221, 0.6);
+            line-height: 1.2;
+        }
+
+        .hero p {
+            font-size: 1.4em;
+            margin-bottom: 40px;
+            opacity: 0.9;
+            max-width: 700px;
+            color: var(--color-text-secondary);
+        }
+
+        .hero .btn {
+            background: linear-gradient(135deg, #A78BFA 0%, #9D4EDD 100%);
+            color: #E8F4F8;
+            padding: 16px 40px;
+            border: 2px solid #A78BFA;
+            border-radius: 50px;
+            font-size: 1.1em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 0 20px rgba(167, 139, 250, 0.5);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero .btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 0 40px rgba(167, 139, 250, 0.8);
+        }
+
+        @media (max-width: 768px) {
+            .hero { min-height: 60vh; }
+            .hero h1 { font-size: 2.5em; }
+            .hero p { font-size: 1.1em; }
+        }
+
+        /* ===== CARDS SECTION ===== */
+        .cards-section {
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .cards-section h2 {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 60px;
+            color: var(--color-text);
+        }
+
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 30px;
+        }
+
+        .card {
+            background: var(--color-surface);
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+        }
+
+        .card:hover {
+            transform: translateY(-12px) scale(1.05);
+            box-shadow: var(--glow), 0 12px 40px rgba(157, 78, 221, 0.3);
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.1) 0%, rgba(232, 121, 249, 0.1) 100%);
+        }
+
+        .card-icon {
+            font-size: 3.5em;
+            margin-bottom: 20px;
+            animation: bounce 2s ease-in-out infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .card h3 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: var(--color-text);
+        }
+
+        .card p {
+            color: var(--color-text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .card-btn {
+            background: linear-gradient(135deg, #9D4EDD 0%, #A78BFA 100%);
+            color: #E8F4F8;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            transition: var(--transition);
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.4);
+        }
+
+        .card-btn:hover {
+            background: linear-gradient(135deg, #E879F9 0%, #FF1493 100%);
+            box-shadow: 0 0 30px rgba(232, 121, 249, 0.6);
+        }
+
+        /* ===== PAGES ===== */
+        .page {
+            display: none;
+            padding: 60px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .page h1 {
+            font-size: 2.5em;
+            margin-bottom: 30px;
+            color: var(--color-primary);
+            border-bottom: 3px solid var(--color-primary);
+            padding-bottom: 15px;
+        }
+
+        .page h2 {
+            font-size: 1.8em;
+            margin-top: 40px;
+            margin-bottom: 20px;
+            color: var(--color-text);
+        }
+
+        .page h3 {
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 15px;
+            color: var(--color-text);
+        }
+
+        .page h4 {
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            color: var(--color-text-secondary);
+        }
+
+        .page p, .page li {
+            font-size: 1em;
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+
+        .page ul, .page ol {
+            margin-left: 30px;
+            margin-bottom: 20px;
+        }
+
+        /* ===== INFO BOXES ===== */
+        .info-box {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.15) 0%, rgba(157, 78, 221, 0.05) 100%);
+            border-left: 4px solid var(--color-primary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(157, 78, 221, 0.1);
+        }
+
+        .info-box.warning {
+            background: linear-gradient(135deg, rgba(232, 121, 249, 0.15) 0%, rgba(232, 121, 249, 0.05) 100%);
+            border-left-color: var(--color-warning);
+        }
+
+        .info-box.success {
+            background: linear-gradient(135deg, rgba(167, 139, 250, 0.15) 0%, rgba(167, 139, 250, 0.05) 100%);
+            border-left-color: var(--color-success);
+        }
+
+        /* ===== FORMULA BOX ===== */
+        .formula-box {
+            background: linear-gradient(135deg, rgba(157, 78, 221, 0.2) 0%, rgba(232, 121, 249, 0.1) 100%);
+            border: 2px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: 'Courier New', monospace;
+            overflow-x: auto;
+            font-size: 1.1em;
+            line-height: 1.8;
+        }
+
+        /* ===== STEP CONTAINER ===== */
+        .step-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .step {
+            display: flex;
+            gap: 20px;
+            padding: 20px;
+            background: var(--color-surface);
+            border-left: 4px solid var(--color-primary);
+            border-radius: 8px;
+        }
+
+        .step-number {
+            min-width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #9D4EDD 0%, #A78BFA 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .step-content h3 {
+            margin-top: 0;
+        }
+
+        .step-content h4 {
+            margin-top: 10px;
+        }
+
+        /* ===== TABLES ===== */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 30px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        th {
+            background: linear-gradient(135deg, #E879F9 0%, #9D4EDD 100%);
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 700;
+        }
+
+        td {
+            padding: 12px;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        tr:hover {
+            background: rgba(33, 150, 243, 0.04);
+        }
+
+        /* ===== FORM ELEMENTS ===== */
+        .form-group {
+            margin: 20px 0;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--color-text);
+        }
+
+        input[type="number"], input[type="text"], select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--color-border);
+            border-radius: 4px;
+            font-size: 1em;
+            transition: var(--transition);
+            background: var(--color-surface);
+            color: var(--color-text);
+        }
+
+        input[type="number"]:focus, input[type="text"]:focus, select:focus {
+            outline: none;
+            border-color: var(--color-primary);
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+
+        /* ===== BUTTONS ===== */
+        .btn-primary {
+            background: linear-gradient(135deg, #9D4EDD 0%, #A78BFA 100%);
+            color: #E8F4F8;
+            border: 2px solid #A78BFA;
+            padding: 12px 32px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 700;
+            font-size: 1em;
+            transition: var(--transition);
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.5);
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #E879F9 0%, #FF1493 100%);
+            transform: translateY(-4px) scale(1.05);
+            box-shadow: 0 0 35px rgba(232, 121, 249, 0.7);
+        }
+
+        /* ===== VISUALIZATION ===== */
+        .visualization {
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            padding: 30px;
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .winding-diagram {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 1;
+            border-radius: 8px;
+            background: var(--color-bg);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+            width: 100%;
+        }
+
+        .result-item {
+            background: var(--color-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
+
+        .result-item-label {
+            font-size: 0.9em;
+            color: var(--color-text-secondary);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .result-item-value {
+            font-size: 1.8em;
+            color: var(--color-primary);
+            font-weight: 700;
+        }
+
+        /* ===== ROTATING FIELD VISUALIZATION ===== */
+        .rotating-field-container {
+            display: flex;
+            flex-direction: column;
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .field-visualization {
+            background: var(--color-surface);
+            border: 2px solid var(--color-border);
+            border-radius: 8px;
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .rotating-field-canvas {
+            width: 100%;
+            max-width: 500px;
+            aspect-ratio: 1;
+            border: 2px solid var(--color-primary);
+            border-radius: 8px;
+            background: var(--color-bg);
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            max-width: 500px;
+            margin: 20px 0;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 20px rgba(157, 78, 221, 0.3);
+        }
+
+        .video-container iframe {
+            width: 100%;
+            height: 315px;
+            border: none;
+        }
+
+        .animation-controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .animation-controls button {
+            padding: 10px 20px;
+            border: 1px solid var(--color-primary);
+            background: transparent;
+            color: var(--color-primary);
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+        }
+
+        .animation-controls button:hover {
+            background: var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .animation-controls button.active {
+            background: var(--color-primary);
+            color: var(--color-text);
+        }
+
+        .comparison-table {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .comparison-item {
+            background: var(--color-surface);
+            border: 2px solid var(--color-primary);
+            border-radius: 8px;
+            padding: 20px;
+        }
+
+        .comparison-item h3 {
+            color: var(--color-primary);
+            margin-bottom: 15px;
+        }
+
+        /* ===== GLOSSARY ===== */
+        .glossary-item {
+            border-left: 4px solid var(--color-primary);
+            padding: 15px;
+            margin: 15px 0;
+            background: var(--color-bg);
+            border-radius: 4px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .glossary-item:hover {
+            background: rgba(33, 150, 243, 0.08);
+            padding-left: 20px;
+        }
+
+        .glossary-term {
+            font-weight: 700;
+            color: var(--color-primary);
+            margin-bottom: 8px;
+        }
+
+        .glossary-definition {
+            color: var(--color-text-secondary);
+            font-size: 0.95em;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 768px) {
+            nav ul {
+                gap: 15px;
+            }
+
+            .hero h1 {
+                font-size: 2em;
+            }
+
+            .cards-container {
+                grid-template-columns: 1fr;
+            }
+
+            .page {
+                padding: 40px 15px;
+            }
+
+            table {
+                font-size: 0.9em;
+            }
+
+            th, td {
+                padding: 8px;
+            }
+
+            .step {
+                flex-direction: column;
+            }
+
+            .video-container iframe {
+                height: 200px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- ===== NAVIGATION ===== -->
+    <nav>
+        <a href="#" class="logo" onclick="showPage('home'); return false;">⚡ Machines Electriques</a>
+        <ul>
+            <li><a onclick="showPage('home'); return false;">Accueil</a></li>
+            <li><a onclick="showPage('generalites'); return false;">Généralités</a></li>
+            <li><a onclick="showPage('theorie'); return false;">Théorie</a></li>
+            <li><a onclick="showPage('application'); return false;">Application</a></li>
+            <li><a onclick="showPage('fem'); return false;">FEM & Pertes</a></li>
+            <li><a onclick="showPage('comparaison'); return false;">Comparaison</a></li>
+            <li><a onclick="showPage('ressources'); return false;">Ressources</a></li>
+        </ul>
+    </nav>
+
+    <!-- ===== HOME PAGE ===== -->
+    <div id="home" class="page active">
+        <div class="hero">
+            <h1>🔌 Bobinage Triphasé Double Couche</h1>
+            <p>Maîtrisez les principes fondamentaux des machines électriques et apprenez à concevoir des bobinages efficaces</p>
+            <button class="btn" onclick="document.querySelector('.cards-section').scrollIntoView({behavior: 'smooth'});">Commencer l'Apprentissage</button>
+        </div>
+
+        <div class="cards-section">
+            <div class="cards-container">
+                <div class="card" onclick="showPage('generalites')">
+                    <div class="card-icon">🔧</div>
+                    <h3>Généralités</h3>
+                    <p>Principes fondamentaux des moteurs asynchrones triphasés</p>
+                    <button class="card-btn">En Savoir Plus</button>
+                </div>
+                <div class="card" onclick="showPage('theorie')">
+                    <div class="card-icon">📚</div>
+                    <h3>Théorie du Bobinage</h3>
+                    <p>Règles et concepts du bobinage triphasé double couche</p>
+                    <button class="card-btn">En Savoir Plus</button>
+                </div>
+                <div class="card" onclick="showPage('application')">
+                    <div class="card-icon">⚙️</div>
+                    <h3>Application</h3>
+                    <p>Simulez et calculez les paramètres d'un bobinage réel</p>
+                    <button class="card-btn">Simuler</button>
+                </div>
+                <div class="card" onclick="showPage('fem')">
+                    <div class="card-icon">⚡</div>
+                    <h3>FEM et Pertes</h3>
+                    <p>Analysez la force électromotrice et les pertes</p>
+                    <button class="card-btn">Analyser</button>
+                </div>
+                <div class="card" onclick="showPage('comparaison')">
+                    <div class="card-icon">📊</div>
+                    <h3>Comparaisons</h3>
+                    <p>Comparez différentes configurations de bobinage</p>
+                    <button class="card-btn">Comparer</button>
+                </div>
+                <div class="card" onclick="showPage('ressources')">
+                    <div class="card-icon">📚</div>
+                    <h3>Ressources</h3>
+                    <p>Glossaire, formules et références techniques</p>
+                    <button class="card-btn">Consulter</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== GENERALITES PAGE ===== -->
+    <div id="generalites" class="page">
+        <h1>🔧 Concepts fondamentaux des machines à courant alternatif</h1>
+
+        <div class="info-box">
+            <strong>⚡ Contexte Historique</strong><br>
+            À la fin du XIXᵉ siècle, <strong>Nikola Tesla (1888)</strong> et <strong>Galileo Ferraris (1885-1888)</strong> ont révolutionné l'électricité en démontrant le principe du <strong>champ magnétique tournant</strong>. 
+            Cette découverte a permis le développement des machines AC, utilisées aujourd'hui dans la production, le transport et l'utilisation de l'énergie électrique.
+        </div>
+
+        <h2>1. Rôle des machines AC dans l'industrie moderne</h2>
+
+        <h3>1.1 Comparaison AC vs DC</h3>
+        <table>
+            <tr>
+                <th>Critère</th>
+                <th>Machine AC (Alternative)</th>
+                <th>Machine DC (Continue)</th>
+            </tr>
+            <tr>
+                <td><strong>Construction</strong></td>
+                <td>✓ Simple, sans balais ni collecteur</td>
+                <td>✗ Complexe, nécessite balais et collecteur</td>
+            </tr>
+            <tr>
+                <td><strong>Maintenance</strong></td>
+                <td>✓ Très faible</td>
+                <td>✗ Élevée, remplacement régulier des balais</td>
+            </tr>
+            <tr>
+                <td><strong>Robustesse</strong></td>
+                <td>✓ Élevée (rotor robuste)</td>
+                <td>✓ Moyenne (collecteur fragile)</td>
+            </tr>
+            <tr>
+                <td><strong>Coût de fabrication</strong></td>
+                <td>✓ 30–50% moins cher</td>
+                <td>✗ Plus coûteux</td>
+            </tr>
+            <tr>
+                <td><strong>Durée de vie</strong></td>
+                <td>✓ 20–30 ans</td>
+                <td>✓ 10–15 ans</td>
+            </tr>
+            <tr>
+                <td><strong>Rendement</strong></td>
+                <td>✓ 85–95%</td>
+                <td>✓ 80–90%</td>
+            </tr>
+        </table>
+
+        <p>
+            Les machines AC fonctionnent grâce à l'interaction entre le <strong>champ statorique</strong> et le <strong>champ rotorique</strong>, générant un <strong>couple électromagnétique</strong> qui met le rotor en mouvement.
+        </p>
+
+        <h2>2. Principe du champ tournant dans les machines AC</h2>
+
+        <h3>2.1 Définition</h3>
+        <p>
+            Un <strong>champ magnétique tournant</strong> a une magnitude constante mais une direction qui tourne dans l'espace à vitesse angulaire constante. 
+            Il est produit par des <strong>courants polyphasés</strong> dans le stator.
+        </p>
+        <div class="info-box success">
+            👉 C'est le <strong>principe fondamental</strong> des machines synchrones et asynchrones.
+        </div>
+
+        <h3>2.2 Origine du champ tournant</h3>
+        <h4>a) Enroulements statoriques</h4>
+        <p>
+            Le stator comporte plusieurs enroulements identiques, répartis régulièrement (généralement trois), décalés de <strong>120° électriques</strong>.
+        </p>
+        <h4>b) Courants triphasés</h4>
+        <p>
+            Chaque enroulement est alimenté par un courant alternatif sinusoïdal, déphasé de 120° par rapport aux autres :
+        </p>
+        <div class="formula-box">
+            i<sub>a</sub> = I<sub>m</sub> cos(ωt)<br>
+            i<sub>b</sub> = I<sub>m</sub> cos(ωt − 120°)<br>
+            i<sub>c</sub> = I<sub>m</sub> cos(ωt − 240°)
+        </div>
+
+        <h3>2.3 Formation du champ tournant</h3>
+        <p>
+            Chaque courant génère un champ magnétique orienté selon son enroulement. La <strong>somme vectorielle</strong> des trois champs produit un champ tournant unique, stable et de module constant.
+        </p>
+        <div class="info-box success">
+            ✔ Amplitude constante<br>
+            ✔ Champ tournant continu dans l'espace<br>
+            ✔ Vitesse dictée par la fréquence du réseau
+        </div>
+
+        <h3>2.4 Vitesse du champ tournant</h3>
+        <p>
+            La <strong>vitesse synchrone</strong> dépend de la fréquence du réseau (f) et du nombre de paires de pôles (p) :
+        </p>
+        <div class="formula-box">
+            n<sub>s</sub> = 60 · f / p  (tr/min)<br>
+            ω<sub>s</sub> = 2πf / p  (rad/s)
+        </div>
+
+        <h3>2.5 Action sur le rotor</h3>
+        <p>
+            Un rotor plongé dans un champ tournant subit des forces électromagnétiques qui génèrent un <strong>couple moteur</strong> :
+        </p>
+        <div class="formula-box">
+            F⃗ = I · l⃗ × B⃗
+        </div>
+        <div class="info-box success">
+            👉 Conversion efficace de l'énergie électrique en énergie mécanique
+        </div>
+ <!-- Visualisation interactive -->
+    <div class="rotating-field-container">
+        <h3 style="text-align: center; margin-top: 40px;">🎬 Visualisation interactive du champ tournant</h3>
+        <div class="field-visualization">
+            <h4 style="font-size: 1.2em;">📹 Vidéo explicative - Champ tournant triphasé</h4>
+            <div class="video-container">
+                <iframe src="https://www.youtube.com/embed/8XF-11MQGQ0" allowfullscreen loading="lazy" title="Champ Magnétique Tournant"></iframe>
+            </div>
+            <p style="text-align: center; color: var(--color-text-secondary);">
+               
+            </p>
+        </div>
+    </div>
+        <h3>2.6 Types de machines AC</h3>
+        <table>
+            <tr>
+                <th>Type</th>
+                <th>Rotor</th>
+                <th>Relation vitesse rotor / champ</th>
+                <th>Remarque</th>
+            </tr>
+            <tr>
+                <td>Synchrone</td>
+                <td>Excité par courant continu ou aimants permanents</td>
+                <td>n = n<sub>s</sub> (g = 0)</td>
+                <td>Le rotor tourne exactement à la vitesse du champ</td>
+            </tr>
+            <tr>
+                <td>Asynchrone (induction)</td>
+                <td>Rotor à courants induits</td>
+                <td>n &lt; n<sub>s</sub>, g = (n<sub>s</sub> − n)/n<sub>s</sub></td>
+                <td>Le rotor glisse légèrement par rapport au champ tournant</td>
+            </tr>
+        </table>
+
+        <button class="btn-primary" onclick="showPage('theorie')" style="width: 100%; margin-top: 30px; padding: 15px; font-size: 1.1em;">
+            Passez à la Théorie du Bobinage →
+        </button>
+    </div>
+
+    <!-- ===== THEORIE PAGE ===== -->
+    <div id="theorie" class="page">
+        <h1>📚 Théorie du Bobinage Triphasé Double Couche</h1>
+
+        <h2>1. Introduction</h2>
+        <p>
+            La réalisation d'un bobinage triphasé à double couche est une étape fondamentale dans la conception des machines électriques. 
+            Cette section présente les définitions, les principes et les méthodes détaillées pour établir un bobinage correct et efficace.
+        </p>
+
+        <h2>2. Définitions et Paramètres Fondamentaux</h2>
+        
+        <h3>2.1 Caractéristiques de la Machine</h3>
+        <p>Soit une machine caractérisée par :</p>
+        <ul>
+            <li><strong>Z :</strong> nombre total d'encoches du stator</li>
+            <li><strong>2p :</strong> nombre de pôles</li>
+            <li><strong>m  :</strong> nombre de phases</li>
+            <li><strong>q :</strong> nombre d'encoches par pôle et par phase</li>
+        </ul>
+        <div class="formula-box">
+            q = Z / (2p · m)
+        </div>
+        <ul>
+            <li><strong>q entier :</strong> q ∈ ℕ (bobinage à q entier)</li>
+            <li><strong>q fractionnaire :</strong> q ∉ ℕ (bobinage à q fractionnaire)</li>
+        </ul>
+
+        <h2>3. Avantages des Enroulements Double Couche</h2>
+        <p>Les enroulements double couche distribués présentent plusieurs avantages par rapport aux enroulements simple couche :</p>
+        <ul>
+            <li>✓ Une meilleure qualité de tension</li>
+            <li>✓ Moins d’harmoniques</li>
+            <li>✓ Plus grande flexibilité de conception</li>
+            <li>✓ Meilleure performance</li>
+            <li>✓ Une large adoption industrielle</li>
+        </ul>
+
+        <h2>4. Principe du Bobinage à Double Couche</h2>
+        <ul>
+            <li>Chaque encoche contient deux conducteurs actifs</li>
+            <li>Le conducteur de la couche supérieure appartient à une bobine</li>
+            <li>Le conducteur de la couche inférieure appartient à une autre bobine</li>
+        </ul>
+
+        <h2>5. Pas de Bobinage</h2>
+
+        <h3>5.1 Pas Diamétral</h3>
+        <p>Le pas diamétral correspond à une bobine couvrant exactement un pas polaire :</p>
+        <div class="formula-box">
+            y = Z / (2p)
+        </div>
+
+        <h3>5.2 Pas Raccourci</h3>
+        <p>Le pas raccourci est défini par y &lt; Z/(2p) et permet de réduire certaines harmoniques :</p>
+       
+ <div class="info-box warning" style="margin-bottom: 20px;">
+            <strong>⚠️ Remarque Importante sur le Pas Raccourci</strong><br><br>
+            Le pas raccourci (y &lt; τp) est obligatoire pour obtenir un bobinage valide lorsque y est fractionnaire. 
+            Il permet de réduire les harmoniques et d'éviter les connexions incorrectes entre phases. 
+        
+        </div>
+        <h2>6. Séquence des Phases</h2>
+        <p>Pour avoir le déphasage de 120° entre les phases, la séquence doit être : A, C, B (ou A, B, C selon la convention)</p>
+    <h3>Etoile Des FEM</h3>
+        <h2>7. Bobinage à Double Couche avec q Entier</h2>
+
+        <h3>7.1 Pas Diamétral</h3>
+
+    
+
+        <div class="step-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Étape 1 : Calcul des Paramètres de Base</h3>
+                    <ol>
+                        <li>Calculer q (nombre d'encoches par pôle et par phase) :<br>
+                            q = Z / (2p · m)<br>
+                            où Z est le nombre total d'encoches, p le nombre de paires de pôles et m le nombre de phases.
+                        </li>
+                        <li>Vérifier que q est un entier</li>
+                        <li>Calculer le pas diamétral :<br>
+                            y = Z / (2p)
+                        </li>
+                        <li>Calculer l'angle électrique entre encoches :<br>
+                            αe = 180° × 2p / Z
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Étape 2 : Déterminer la Répartition sous Chaque Pôle</h3>
+                    <ul>
+                        <li>Nombre d'encoches par pôle : Z / (2p)</li>
+                        <li>Sous chaque pôle, on aura q encoches pour chaque phase</li>
+                        <li>Établir la séquence des phases pour obtenir un déphasage de 120°</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Étape 3 : Établir le Tableau de Répartition</h3>
+                    <ol>
+                        <li>Numéroter toutes les encoches de 1 à Z</li>
+                        <li>Pour la couche supérieure :
+                            <ul>
+                                <li>Répartir les phases selon la séquence choisie (exemple : A, C, B)</li>
+                                <li>Alterner les polarités (+/-) après chaque pas polaire</li>
+                            </ul>
+                        </li>
+                        <li>Pour la couche inférieure :
+                            <ul>
+                                <li>Décalage naturel dû au pas de bobinage y</li>
+                                <li>Respecter l'alternance des polarités</li>
+                            </ul>
+                        </li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Étape 4 : Vérifier la Symétrie</h3>
+                    <ul>
+                        <li>L'ordre de bobinage doit être symétrique pour chaque phase</li>
+                        <li>Exemple typique : sup+ → inf− → inf+ → sup−</li>
+                        <li>Vérifier que chaque phase a le même nombre de bobines</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+       
+
+        <button class="btn-primary" onclick="toggleExample1()" style="width: 100%; margin-top: 20px; padding: 12px; font-size: 1em;">
+            📊 Exemple 
+        </button>
+
+        <div id="example1-table" style="display: none; margin-top: 20px;">
+            <p><strong>Paramètres :</strong></p>
+            <ul>
+                <li>m = 3 phases</li>
+                <li>2p = 4 pôles</li>
+                <li>Z = 12 encoches</li>
+            </ul>
+
+            <h4>Calculs :</h4>
+            <div class="formula-box">
+                q = Z / (2p · m) = 12 / (4 · 3) = 1 (q entier)
+            </div>
+
+            <h4>Pas de Bobinage :</h4>
+            <div class="formula-box">
+                y = Z / (2p) = 12 / 4 = 3 encoches
+            </div>
+
+            <h4>Angle Électrique entre Deux Encoches :</h4>
+            <div class="formula-box">
+                αe = 180° · 2p / Z = 180° · 4 / 12 = 60°
+            </div>
+
+            <h4>Tableau 1 – Répartition des Encoches et des Faisceaux par Phase</h4>
+            <table>
+                <tr>
+                    <th>Encoches</th>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux supérieurs</th>
+                    <td>A+</td>
+                    <td>C+</td>
+                    <td>B+</td>
+                    <td>A-</td>
+                    <td>C-</td>
+                    <td>B-</td>
+                    <td>A+</td>
+                    <td>C+</td>
+                    <td>B+</td>
+                    <td>A-</td>
+                    <td>C-</td>
+                    <td>B-</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux inférieurs</th>
+                    <td>A+</td>
+                    <td>C-</td>
+                    <td>B+</td>
+                    <td>A-</td>
+                    <td>C+</td>
+                    <td>B-</td>
+                    <td>A+</td>
+                    <td>C-</td>
+                    <td>B+</td>
+                    <td>A-</td>
+                    <td>C+</td>
+                    <td>B-</td>
+                </tr>
+            </table>
+        </div>
+
+        <h3>7.2 Pas Raccourci </h3>
+
+        <div class="step-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Étape 1 : Calcul des Paramètres</h3>
+                    <ol>
+                        <li>Calculer q (entier) : q = Z / (2p · m)</li>
+                        <li>Calculer le pas polaire théorique : τp = Z / (2p)</li>
+                        <li>Définir le pas d'enroulement raccourci : y = τp − raccourcissement</li>
+                        <li>Calculer l'angle électrique par encoche : αe = 180° / τp</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Étape 2 : Déterminer les Entrées des Phases</h3>
+                    <ul>
+                        <li>Définir l'encoche de départ de chaque phase :
+                            <ul>
+                                <li>Phase A : encoche n°1</li>
+                                <li>Phase B : décalage de q · 2p / 3 encoches</li>
+                                <li>Phase C : décalage de 2q · 2p / 3 encoches</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Étape 3 : Répartition Initiale</h3>
+                    <ol>
+                        <li>Créer un tableau avec toutes les encoches numérotées de 1 à Z</li>
+                        <li>Attribuer q encoches consécutives à chaque phase sous chaque pôle</li>
+                        <li>Répéter pour les deux couches (initialement identiques)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Étape 4 : Correction pour le Pas Raccourci</h3>
+                    <ul>
+                        <li><strong>Problème identifié :</strong> avec le pas raccourci, des faisceaux de phases différentes peuvent se connecter</li>
+                        <li><strong>Solution :</strong> décaler la couche inférieure du nombre d'encoches correspondant au raccourcissement</li>
+                        <li>Décalage vers la gauche (ou droite selon la convention adoptée)</li>
+                        <li>Vérifier que chaque bobine connecte uniquement des faisceaux de la même phase</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>Étape 5 : Validation Finale</h3>
+                    <ul>
+                        <li>Vérifier que le pas y connecte bien les couches supérieure et inférieure</li>
+                        <li>Contrôler l'alternance des polarités</li>
+                        <li>S'assurer qu'aucune phase ne se connecte à une autre</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+    
+        <button class="btn-primary" onclick="toggleExample2()" style="width: 100%; margin-top: 15px; padding: 12px; font-size: 1em;">
+            📊 Exemple 
+        </button>
+
+        <div id="example2-tables" style="display: none; margin-top: 20px;">
+            <h4>Énoncé :</h4>
+            <p>Tracer le schéma de bobinage du stator d'une génératrice synchrone présentant les caractéristiques suivantes :</p>
+            <ul>
+                <li>Nombre de pôles : 2</li>
+                <li>Nombre d'encoches : 24</li>
+                <li>Nombre de couches : 2</li>
+                <li>Type d'enroulement : pas raccourci</li>
+                <li>Raccourcissement : une encoche</li>
+            </ul>
+
+            <h4>Solution :</h4>
+            <div class="formula-box">
+                Pas polaire : τp = 24 / 2 = 12<br>
+                Pas d'enroulement : y = 11<br>
+                Encoches par phase et par pôle : q = 4<br>
+                Angle électrique entre deux encoches : α = 180° / 12 = 15°
+            </div>
+
+            <h4>Entrées des Phases :</h4>
+            <ul>
+                <li>Entrée de la phase A : encoche n°1</li>
+                <li>Entrée de la phase B : encoche n°9</li>
+                <li>Entrée de la phase C : encoche n°17</li>
+            </ul>
+
+            <h4>Tableau 2 – Répartition Initiale des Encoches et Faisceaux</h4>
+            <table>
+                <tr>
+                    <th>Encoches</th>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux supérieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux inférieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <th>Encoches</th>
+                    <td>13</td>
+                    <td>14</td>
+                    <td>15</td>
+                    <td>16</td>
+                    <td>17</td>
+                    <td>18</td>
+                    <td>19</td>
+                    <td>20</td>
+                    <td>21</td>
+                    <td>22</td>
+                    <td>23</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux supérieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux inférieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+            </table>
+
+            <h4>Correction de la Répartition</h4>
+            <p>
+                Le pas d'enroulement étant égal à 11, le faisceau n°1 de la phase A devrait être connecté au faisceau n°12 de la phase B. 
+                Or, un faisceau d'une phase ne peut pas être connecté à un faisceau appartenant à une autre phase.
+            </p>
+            <p>
+                Pour résoudre ce problème, on décale vers la gauche le groupe de faisceaux inférieurs d'une encoche. 
+                On obtient ainsi la répartition corrigée des encoches, présentée dans le tableau 3.
+            </p>
+
+            <h4>Tableau 3 – Répartition Corrigée des Encoches et Faisceaux</h4>
+            <table>
+                <tr>
+                    <th>Encoches</th>
+                    <td>1</td>
+                    <td>2</td>
+                    <td>3</td>
+                    <td>4</td>
+                    <td>5</td>
+                    <td>6</td>
+                    <td>7</td>
+                    <td>8</td>
+                    <td>9</td>
+                    <td>10</td>
+                    <td>11</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux supérieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux inférieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>A</td>
+                </tr>
+            </table>
+
+            <table>
+                <tr>
+                    <th>Encoches</th>
+                    <td>13</td>
+                    <td>14</td>
+                    <td>15</td>
+                    <td>16</td>
+                    <td>17</td>
+                    <td>18</td>
+                    <td>19</td>
+                    <td>20</td>
+                    <td>21</td>
+                    <td>22</td>
+                    <td>23</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux supérieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                </tr>
+                <tr>
+                    <th>Faisceaux inférieurs</th>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>A</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>C</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>B</td>
+                    <td>A</td>
+                </tr>
+            </table>
+        </div>
+
+        <h2>8. Bobinage à Double Couche avec q Fractionnaire</h2>
+
+        <div class="step-container">
+            <div class="step">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h3>Étape 1 : Calcul des Paramètres</h3>
+                    <ol>
+                        <li>Calculer q (nombre d'encoches par pôle et par phase, entier) : q = Z / (2p · m)</li>
+                        <li>Calculer le pas polaire théorique : τp = Z / (2p)</li>
+                        <li>Définir le pas d'enroulement raccourci : y = τp − raccourcissement</li>
+                        <li>Calculer l'angle électrique par encoche : αe = 180° / τp</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h3>Étape 2 : Déterminer les Entrées des Phases</h3>
+                    <ul>
+                        <li>Définir l'encoche de départ de chaque phase :
+                            <ul>
+                                <li>Phase A : encoche n°1</li>
+                                <li>Phase B : décalage de q · 2p / 3 encoches</li>
+                                <li>Phase C : décalage de 2q · 2p / 3 encoches</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h3>Étape 3 : Répartition Initiale</h3>
+                    <ol>
+                        <li>Créer un tableau avec toutes les encoches numérotées de 1 à Z</li>
+                        <li>Attribuer q encoches consécutives à chaque phase sous chaque pôle</li>
+                        <li>Répéter pour les deux couches (initialement identiques)</li>
+                    </ol>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h3>Étape 4 : Correction pour le Pas Raccourci</h3>
+                    <ul>
+                        <li>Problème identifié : avec le pas raccourci, des faisceaux de phases différentes peuvent se connecter</li>
+                        <li>Solution : décaler la couche inférieure du nombre d'encoches correspondant au raccourcissement</li>
+                        <li>Décalage vers la gauche (ou droite selon la convention adoptée)</li>
+                        <li>Vérifier que chaque bobine connecte uniquement des faisceaux de la même phase</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="step">
+                <div class="step-number">5</div>
+                <div class="step-content">
+                    <h3>Étape 5 : Validation Finale</h3>
+                    <ul>
+                        <li>Vérifier que le pas y connecte bien les couches supérieure et inférieure</li>
+                        <li>Contrôler l'alternance des polarités</li>
+                        <li>S'assurer qu'aucune phase ne se connecte à une autre</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+       
+
+        <button class="btn-primary" onclick="toggleExample3()" style="width: 100%; margin-top: 15px; padding: 12px; font-size: 1em;">
+            📊 Exemple 
+        </button>
+
+        <div id="example3-tables" style="display: none; margin-top: 20px;">
+            <p><strong>Paramètres :</strong></p>
+            <ul>
+                <li>m = 3 phases</li>
+                <li>2p = 6 pôles</li>
+                <li>Z = 27 encoches</li>
+            </ul>
+
+            <h4>Calculs :</h4>
+            <div class="formula-box">
+                q = 27 / (6 · 3) = 1.5<br>
+                Chaque phase fait une alternance de 2 et 1 encoches
+            </div>
+
+            <h4>Pas de Bobinage Raccourci :</h4>
+            <div class="formula-box">
+                yd = 27 / 6 = 4.5<br>
+                On choisit le pas : y = 4 encoches<br>
+                Sous chaque pôle on aura une alternance entre 5 et 4
+            </div>
+
+            <h4>Angle Électrique entre Deux Encoches :</h4>
+            <div class="formula-box">
+                αe = 180° · 2p / Z = 180° · 6 / 27 ≈ 40°
+            </div>
+
+            <h4>Tableau Simplifié de Répartition</h4>
+            <table>
+                <tr>
+                    <th>Phase \ Pôle</th>
+                    <th colspan="2">1</th>
+                    <th colspan="2">2</th>
+                    <th colspan="2">3</th>
+                    <th colspan="2">4</th>
+                    <th colspan="2">5</th>
+                    <th colspan="2">6</th>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>+</td>
+                    <td>-</td>
+                    <td>+</td>
+                    <td>-</td>
+                    <td>+</td>
+                    <td>-</td>
+                    <td>+</td>
+                    <td>-</td>
+                    <td>+</td>
+                    <td>-</td>
+                    <td>+</td>
+                    <td>-</td>
+                </tr>
+                <tr>
+                    <th>A</th>
+                    <td>1</td>
+                    <td>5</td>
+                    <td>10</td>
+                    <td>6</td>
+                    <td>10</td>
+                    <td>14</td>
+                    <td>19</td>
+                    <td>15</td>
+                    <td>19</td>
+                    <td>23</td>
+                    <td>1</td>
+                    <td>24</td>
+                </tr>
+                <tr>
+                    <th>C</th>
+                    <td>2</td>
+                    <td>6</td>
+                    <td>11</td>
+                    <td>15</td>
+                    <td>20</td>
+                    <td>24</td>
+                    <td>7</td>
+                    <td>3</td>
+                    <td>7</td>
+                    <td>11</td>
+                    <td>16</td>
+                    <td>12</td>
+                </tr>
+                <tr>
+                    <th>B</th>
+                    <td>3</td>
+                    <td>7</td>
+                    <td>12</td>
+                    <td>16</td>
+                    <td>21</td>
+                    <td>25</td>
+                    <td>8</td>
+                    <td>4</td>
+                    <td>8</td>
+                    <td>12</td>
+                    <td>17</td>
+                    <td>21</td>
+                </tr>
+            </table>
+
+            <h4>Tableau 4 – Tableau de Répartition des Encoches pour Bobinage Triphasé Double Couche</h4>
+            <table>
+            <tr>
+                <th>Encoche</th>
+                <th>Couche Supérieure</th>
+                <th>Couche Inférieure</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>A+</td>
+                <td>A+</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>A+</td>
+                <td>C-</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>C-</td>
+                <td>C-</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>B+</td>
+                <td>B+</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>B+</td>
+                <td>A-</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>A-</td>
+                <td>A-</td>
+            </tr>
+            <tr>
+                <td>7</td>
+                <td>C+</td>
+                <td>C+</td>
+            </tr>
+            <tr>
+                <td>8</td>
+                <td>C+</td>
+                <td>B-</td>
+            </tr>
+            <tr>
+                <td>9</td>
+                <td>B-</td>
+                <td>B-</td>
+            </tr>
+            <tr>
+                <td>10</td>
+                <td>A+</td>
+                <td>A+</td>
+            </tr>
+            <tr>
+                <td>11</td>
+                <td>A+</td>
+                <td>C-</td>
+            </tr>
+            <tr>
+                <td>12</td>
+                <td>C-</td>
+                <td>C-</td>
+            </tr>
+            <tr>
+                <td>13</td>
+                <td>B+</td>
+                <td>B+</td>
+            </tr>
+            <tr>
+                <td>14</td>
+                <td>B+</td>
+                <td>A-</td>
+            </tr>
+            <tr>
+                <td>15</td>
+                <td>A-</td>
+                <td>A-</td>
+            </tr>
+            <tr>
+                <td>16</td>
+                <td>C+</td>
+                <td>C+</td>
+            </tr>
+            <tr>
+                <td>17</td>
+                <td>C+</td>
+                <td>B-</td>
+            </tr>
+            <tr>
+                <td>18</td>
+                <td>B-</td>
+                <td>B-</td>
+            </tr>
+            <tr>
+                <td>19</td>
+                <td>A+</td>
+                <td>A+</td>
+            </tr>
+            <tr>
+                <td>20</td>
+                <td>A+</td>
+                <td>C-</td>
+            </tr>
+            <tr>
+                <td>21</td>
+                <td>C-</td>
+                <td>C-</td>
+            </tr>
+            <tr>
+                <td>22</td>
+                <td>B+</td>
+                <td>B+</td>
+            </tr>
+            <tr>
+                <td>23</td>
+                <td>B+</td>
+                <td>A-</td>
+            </tr>
+            <tr>
+                <td>24</td>
+                <td>A-</td>
+                <td>A-</td>
+            </tr>
+            <tr>
+                <td>25</td>
+                <td>C+</td>
+                <td>C+</td>
+            </tr>
+            <tr>
+                <td>26</td>
+                <td>C+</td>
+                <td>B-</td>
+            </tr>
+            <tr>
+                <td>27</td>
+                <td>B-</td>
+                <td>B-</td>
+            </tr>
+        </table>
+ </div>
+   <div>
+        <button class="btn-primary" onclick="showPage('application')" style="width: 100%; margin-top: 30px; padding: 15px; font-size: 1.1em;">
+            Passez à l'Application →
+        </button>
+    </div>
+
+    <!-- ===== APPLICATION PAGE ===== -->
+    <div id="application" class="page">
+        <h1>⚙️ Application du Bobinage - Simulateur Interactif</h1>
+
+        <div class="visualization">
+            <h2>Paramètres d'Entrée</h2>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="simZ">Nombre d'encoches (Z) :</label>
+                    <input type="number" id="simZ" value="36" min="12" step="12">
+                </div>
+                <div class="form-group">
+                    <label for="simP">Nombre de paires de pôles (p) :</label>
+                    <input type="number" id="simP" value="2" min="1" max="4">
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="simY">Pas de bobinage (y) :</label>
+                    <input type="number" id="simY" value="8" min="1" max="12">
+                </div>
+                <div class="form-group">
+                    <label for="simTurns">Spires par bobine :</label>
+                    <input type="number" id="simTurns" value="10" min="1" max="50">
+                </div>
+            </div>
+
+            <button class="btn-primary" onclick="calculateWinding()" style="width: 100%; margin-top: 20px; padding: 15px; font-size: 1.1em;">🧮 Calculer les Paramètres</button>
+        </div>
+
+        <div id="applicationResults" style="display: none;">
+            <div class="visualization">
+                <h2>📊 Résultats Détaillés</h2>
+                <div class="results-grid">
+                    <div class="result-item">
+                        <div class="result-item-label">Encoches / Pôle / Phase</div>
+                        <div class="result-item-value" id="resultQ">3</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-item-label">Pas Polaire (τp)</div>
+                        <div class="result-item-value" id="resultTauP">9</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-item-label">Angle β (°)</div>
+                        <div class="result-item-value" id="resultBeta">20°</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-item-label">Facteur Distribution</div>
+                        <div class="result-item-value" id="resultKd">0.957</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-item-label">Facteur Raccourcissement</div>
+                        <div class="result-item-value" id="resultKy">0.985</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-item-label">Facteur Bobinage kw</div>
+                        <div class="result-item-value" id="resultKw">0.942</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="showPage('fem')" style="width: 100%; margin-top: 30px; padding: 15px; font-size: 1.1em;">
+            Passez à FEM & Pertes →
+        </button>
+    </div>
+
+    <!-- ===== FEM PAGE ===== -->
+    <div id="fem" class="page">
+        <h1>⚡ Force Électromotrice et Pertes</h1>
+
+        <h2>1. Force Électromotrice Induite (FEM)</h2>
+        <p>La force électromotrice induite dans un bobinage est donnée par :</p>
+        <div class="formula-box">
+            E = kw · Φ · f · Z · N<br><br>
+            Où :<br>
+            - kw = facteur de bobinage<br>
+            - Φ = flux magnétique par pôle<br>
+            - f = fréquence (Hz)<br>
+            - Z = nombre d'encoches<br>
+            - N = nombre de spires par bobine
+        </div>
+
+        <h2>2. Types de Pertes</h2>
+        <table>
+            <tr>
+                <th>Type de Perte</th>
+                <th>Formule</th>
+                <th>Description</th>
+            </tr>
+            <tr>
+                <td>Pertes Joule (Cu)</td>
+                <td>PJ = I² · R</td>
+                <td>Échauffement dans les conducteurs</td>
+            </tr>
+            <tr>
+                <td>Pertes Fer (Fe)</td>
+                <td>PFe = k · f · B²</td>
+                <td>Hystérésis et courants de Foucault</td>
+            </tr>
+            <tr>
+                <td>Pertes Mécaniques</td>
+                <td>Pm ≈ 0.5-3% P</td>
+                <td>Frottements et ventilation</td>
+            </tr>
+        </table>
+
+        <h2>3. Rendement</h2>
+        <div class="formula-box">
+            η = (P - Ptot) / P × 100%<br><br>
+            Où Ptot = PJ + PFe + Pm
+        </div>
+
+        <button class="btn-primary" onclick="showPage('comparaison')" style="width: 100%; margin-top: 30px; padding: 15px; font-size: 1.1em;">
+            Passez à la Comparaison →
+        </button>
+    </div>
+
+    <!-- ===== COMPARAISON PAGE ===== -->
+    <div id="comparaison" class="page">
+        <h1>📊 Comparaison des Configurations de Bobinage</h1>
+
+        <h2>Bobinage Simple Couche vs Double Couche</h2>
+        
+        <div class="comparison-table">
+            <div class="comparison-item">
+                <h3>Simple Couche</h3>
+                <ul>
+                    <li>Une seule bobine par encoche</li>
+                    <li>Facteur de bobinage plus faible</li>
+                    <li>Harmoniques plus élevées</li>
+                    <li>Fabrication moins flexible</li>
+                    <li>Moins efficace</li>
+                </ul>
+            </div>
+            <div class="comparison-item">
+                <h3>Double Couche</h3>
+                <ul>
+                    <li>Deux bobines par encoche</li>
+                    <li>Facteur de bobinage plus élevé</li>
+                    <li>Réduction des harmoniques</li>
+                    <li>Fabrication plus flexible</li>
+                    <li>Meilleur rendement</li>
+                </ul>
+            </div>
+        </div>
+
+        <h2>Pas Diamétral vs Pas Raccourci</h2>
+        
+        <div class="comparison-table">
+            <div class="comparison-item">
+                <h3>Pas Diamétral</h3>
+                <ul>
+                    <li>y = Z / (2p)</li>
+                    <li>Bobine recouvre un pas polaire complet</li>
+                    <li>Kp = 1 (pas de réduction)</li>
+                    <li>Plus simple à concevoir</li>
+                </ul>
+            </div>
+            <div class="comparison-item">
+                <h3>Pas Raccourci</h3>
+                <ul>
+                    <li>y &lt; Z / (2p)</li>
+                    <li>Bobine recouvre moins qu'un pas polaire</li>
+                    <li>Kp &lt; 1 (réduction d'harmoniques)</li>
+                    <li>Réduction spécifique de certaines harmoniques</li>
+                </ul>
+            </div>
+        </div>
+
+        <button class="btn-primary" onclick="showPage('ressources')" style="width: 100%; margin-top: 30px; padding: 15px; font-size: 1.1em;">
+            Passez aux Ressources →
+        </button>
+    </div>
+
+    <!-- ===== RESSOURCES PAGE ===== -->
+    <div id="ressources" class="page">
+        <h1>📚 Ressources et Glossaire</h1>
+
+        <h2>Glossaire Technique</h2>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Bobinage</div>
+            <div class="glossary-definition">Ensemble de conducteurs disposés dans les encoches du stator pour créer un champ magnétique triphasé.</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Encoche</div>
+            <div class="glossary-definition">Cavité longitudinale dans le stator où sont placés les conducteurs de l'enroulement.</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Pas de Bobinage (y)</div>
+            <div class="glossary-definition">Distance angulaire entre deux côtés actifs d'une bobine, exprimée en nombre d'encoches.</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Pas Polaire (τp)</div>
+            <div class="glossary-definition">Nombre d'encoches occupant un pôle magnétique, calculé comme Z / (2p).</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Facteur de Bobinage (kw)</div>
+            <div class="glossary-definition">Produit du facteur de distribution (kd) et du facteur de raccourcissement (ky), qui quantifie l'efficacité du bobinage.</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Facteur de Distribution (kd)</div>
+            <div class="glossary-definition">Correction due à la répartition des bobines sur plusieurs encoches au lieu d'une seule.</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Facteur de Raccourcissement (ky)</div>
+            <div class="glossary-definition">Correction due au raccourcissement du pas de bobinage par rapport au pas polaire.</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Double Couche</div>
+            <div class="glossary-definition">Configuration où chaque encoche contient deux conducteurs (un supérieur, un inférieur) appartenant à des bobines différentes.</div>
+        </div>
+
+        <div class="glossary-item">
+            <div class="glossary-term">Champ Magnétique Tournant</div>
+            <div class="glossary-definition">Champ créé par les courants triphasés, dont la direction tourne à vitesse synchrone.</div>
+        </div>
+
+        <h2>Formules Principales</h2>
+        <div class="formula-box">
+            <strong>1. Encoches par Pôle et Phase :</strong><br>
+            q = Z / (2p · m)<br><br>
+            
+            <strong>2. Pas Polaire :</strong><br>
+            τp = Z / (2p)<br><br>
+            
+            <strong>3. Angle Électrique entre Encoches :</strong><br>
+            αe = 180° × 2p / Z<br><br>
+            
+            <strong>4. Facteur de Distribution :</strong><br>
+            kd = sin(qβ/2) / (q × sin(β/2))<br><br>
+            
+            <strong>5. Facteur de Raccourcissement :</strong><br>
+            ky = cos(ε/2)<br><br>
+            
+            <strong>6. Facteur de Bobinage :</strong><br>
+            kw = kd × ky<br><br>
+            
+            <strong>7. FEM Induite :</strong><br>
+            E = kw · Φ · f · Z · N<br><br>
+            
+            <strong>8. Vitesse Synchrone :</strong><br>
+            ns = 60 · f / p (tr/min)
+        </div>
+
+        <h2>Références Bibliographiques</h2>
+        <ul>
+            <li>Chapman, S. J. (2005). Electric Machinery Fundamentals (4th ed.). McGraw-Hill.</li>
+            <li>Boldea, I., & Nasar, S. A. (2005). Electric Machines: Steady State, Transients, and Design with MATLAB. CRC Press.</li>
+            <li>Kostenko, M., & Piotrovsky, L. (1969). Electrical Machines. Mir Publishers.</li>
+            <li>Fitzgerald, A. E., Kingsley, C., & Kusko, A. (2003). Electric Machinery (6th ed.). McGraw-Hill.</li>
+        </ul>
+
+        <button class="btn-primary" onclick="showPage('home')" style="width: 100%; margin-top: 30px; padding: 15px; font-size: 1.1em;">
+            Retour à l'Accueil
+        </button>
+    </div>
+
+    <script>
+        // ===== PAGE NAVIGATION =====
+        function showPage(pageName) {
+            const pages = document.querySelectorAll('.page');
+            pages.forEach(page => page.classList.remove('active'));
+            document.getElementById(pageName).classList.add('active');
+            window.scrollTo(0, 0);
+        }
+
+        // ===== TOGGLE EXAMPLE TABLES =====
+        function toggleExample1() {
+            const element = document.getElementById('example1-table');
+            const button = event.target;
+            if (element.style.display === 'none') {
+                element.style.display = 'block';
+                button.textContent = '📊 Masquer le Tableau de Répartition';
+            } else {
+                element.style.display = 'none';
+                button.textContent = '📊 Afficher le Tableau de Répartition';
+            }
+        }
+
+        function toggleExample2() {
+            const element = document.getElementById('example2-tables');
+            const button = event.target;
+            if (element.style.display === 'none') {
+                element.style.display = 'block';
+                button.textContent = '📊 Masquer les Tableaux de Répartition';
+            } else {
+                element.style.display = 'none';
+                button.textContent = '📊 Afficher les Tableaux de Répartition';
+            }
+        }
+
+        function toggleExample3() {
+            const element = document.getElementById('example3-tables');
+            const button = event.target;
+            if (element.style.display === 'none') {
+                element.style.display = 'block';
+                button.textContent = '📊 Masquer les Tableaux de Répartition';
+            } else {
+                element.style.display = 'none';
+                button.textContent = '📊 Afficher les Tableaux de Répartition';
+            }
+        }
+
+        // ===== CALCULATOR FUNCTION =====
+        function calculateWinding() {
+            const Z = parseInt(document.getElementById('simZ').value);
+            const p = parseInt(document.getElementById('simP').value);
+            const y = parseInt(document.getElementById('simY').value);
+            const turns = parseInt(document.getElementById('simTurns').value);
+
+            const m = 3; // Triphasé
+            const q = Z / (2 * p * m);
+            const tauP = Z / (2 * p);
+            const beta = 180 / tauP;
+            
+            // Facteur de distribution
+            const qBeta = q * beta * Math.PI / 180;
+            const kd = Math.sin(qBeta / 2) / (q * Math.sin(beta * Math.PI / 360));
+            
+            // Facteur de raccourcissement
+            const raccourcissement = tauP - y;
+            const epsilon = 180 * raccourcissement / tauP;
+            const ky = Math.cos(epsilon * Math.PI / 360);
+            
+            // Facteur de bobinage
+            const kw = kd * ky;
+
+            // Afficher les résultats
+            document.getElementById('resultQ').textContent = q.toFixed(2);
+            document.getElementById('resultTauP').textContent = tauP.toFixed(1);
+            document.getElementById('resultBeta').textContent = beta.toFixed(1) + '°';
+            document.getElementById('resultKd').textContent = kd.toFixed(3);
+            document.getElementById('resultKy').textContent = ky.toFixed(3);
+            document.getElementById('resultKw').textContent = kw.toFixed(3);
+
+            document.getElementById('applicationResults').style.display = 'block';
+            document.getElementById('applicationResults').scrollIntoView({ behavior: 'smooth' });
+        }
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Three-Phase Winding Calculator</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">
+        </div>
+        <div class="nav-links">
+            <button class="nav-btn active" onclick="showPage('dashboard', this)">Dashboard</button>
+            <button class="nav-btn" onclick="showPage('calculator', this)">Calculator</button>
+            <button class="nav-btn" onclick="showPage('guide', this)">Guide</button>
+            <a class="nav-btn" href="theory.html">Theory</a>
+            <button class="nav-btn" id="themeToggle" type="button">🌙 Dark</button>
+        </div>
+    </nav>
+
+    <!-- Dashboard Page -->
+    <div id="dashboard" class="page active">
+        <div class="dashboard-header">
+            <h1>Winding Dashboard</h1>
+            <p>Manage your three-phase AC machine winding projects. Design, calculate, and visualize double-layer windings with precision.</p>
+            <button class="new-project-btn" onclick="showPage('calculator', this)">
+                ➕ New Project
+            </button>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">🎯</div>
+                <h3>Precise Calculations</h3>
+                <p>Advanced algorithms for accurate winding factor calculations including pitch factor (Kp), distribution factor (Kd), and winding factor (Kw) for both integer and fractional q.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📊</div>
+                <h3>Visual Simulation</h3>
+                <p>Interactive circular and linear diagrams that visualize your winding configuration with color-coded phases and clear connection paths.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">🔄</div>
+                <h3>Double-Layer Support</h3>
+                <p>Full support for double-layer windings with both full-pitch (diametral) and short-pitch (raccourci) configurations for optimal machine performance.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📚</div>
+                <h3>Educational Resources</h3>
+                <p>Comprehensive guide with detailed explanations of fundamental parameters, winding theory, and best practices for AC machine design.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">⚙️</div>
+                <h3>Flexible Configuration</h3>
+                <p>Support for various slot, pole, and phase combinations with automatic validation and intelligent parameter suggestions.</p>
+            </div>
+
+            <div class="feature-card">
+                <div class="feature-icon">📋</div>
+                <h3>Detailed Reports</h3>
+                <p>Generate comprehensive winding tables with complete connection information, making implementation straightforward and error-free.</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Calculator Page -->
+    <div id="calculator" class="page">
+        <div class="calculator-container">
+            <div class="calculator-header">
+                <h2>Winding Calculator</h2>
+                <p>Configure your machine specifications</p>
+            </div>
+
+            <div class="calculator-content">
+                <div class="calculator-sidebar">
+                    <h3 style="margin-bottom: 25px; color: var(--text-main);">Project Configuration</h3>
+
+                    <div class="form-group">
+                        <label for="projectName">Project Name</label>
+                        <input type="text" id="projectName" placeholder="My Winding Project" value="Project 1">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="slots">Number of Slots (Z)</label>
+                        <input type="number" id="slots" min="6" value="24">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="poles">Number of Poles (2p)</label>
+                        <input type="number" id="poles" min="2" step="2" value="4">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="phases">Number of Phases (m)</label>
+                        <input type="number" id="phases" min="3" value="3">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="pitchType">Winding Pitch</label>
+                        <select id="pitchType" onchange="updatePitchInput()">
+                            <option value="full">Full Pitch (Diametral)</option>
+                            <option value="short">Short Pitch (Raccourci)</option>
+                        </select>
+                    </div>
+
+                    <!-- NEW: offset instead of absolute coil pitch -->
+                    <div class="form-group" id="pitchInputGroup" style="display: none;">
+                        <label for="coilOffset">Pitch Offset (slots)</label>
+                        <input type="number" id="coilOffset" min="1" step="1">
+                        <small>Offset = τ − y (e.g. 1 slot short-pitch)</small>
+                    </div>
+
+                    <button class="calculate-btn" onclick="calculate()">⚡ Calculate Winding</button>
+                </div>
+
+                <div class="calculator-main">
+                    <div id="errorAlert" class="alert alert-error"></div>
+
+                    <div id="results" style="display: none;">
+                        <h3 style="color: var(--text-main); margin-bottom: 25px; font-size: 28px;">Calculation Results</h3>
+
+                        <div class="results-grid" id="resultsGrid"></div>
+
+                        <div class="diagram-section">
+                            <h3>Winding Diagrams</h3>
+                            <div class="diagram-tabs">
+                                <button class="tab-btn active" onclick="showDiagram('linear', this)">Linear</button>
+                                <button class="tab-btn" onclick="showDiagram('circular', this)">Circular</button>
+                                <button class="tab-btn" onclick="showDiagram('table', this)">Table</button>
+                            </div>
+<div class="animation-controls">
+    <button type="button" onclick="startWindingAnimation()">▶ Play</button>
+    <button type="button" onclick="pauseWindingAnimation()">⏸ Pause</button>
+    <button type="button" onclick="resetWindingAnimation()">⟲ Reset</button>
+    <label style="margin-left:10px;">
+        Speed:
+        <input type="range" id="animSpeed" min="0.2" max="2" step="0.2" value="1">
+    </label>
+</div>
+
+                            <!-- Linear diagram -->
+                            <div id="linearDiagram" class="diagram-content active">
+                                <div class="legend" id="legendLinear"></div>
+                                <canvas id="linearCanvas"></canvas>
+
+                                <div id="linearFilters"
+                                     style="margin: 12px auto 0; text-align: center; max-width: 1000px;">
+                                    <button onclick="setPhaseFilter('ALL')"    class="filter-btn">All phases</button>
+                                    <button onclick="setPhaseFilter('A')"      class="filter-btn">Phase A</button>
+                                    <button onclick="setPhaseFilter('B')"      class="filter-btn">Phase B</button>
+                                    <button onclick="setPhaseFilter('C')"      class="filter-btn">Phase C</button>
+                                    <button onclick="setLayerFilter('BOTH')"   class="filter-btn">Top+Bottom</button>
+                                    <button onclick="setLayerFilter('TOP')"    class="filter-btn">Top only</button>
+                                    <button onclick="setLayerFilter('BOTTOM')" class="filter-btn">Bottom only</button>
+                                </div>
+                            </div>
+
+                            <!-- Circular diagram -->
+                            <div id="circularDiagram" class="diagram-content">
+                                <div class="legend" id="legendCircular"></div>
+                                <canvas id="circularCanvas"></canvas>
+
+                                <div id="circularFilters"
+                                     style="margin: 12px auto 0; text-align: center; max-width: 1000px;">
+                                    <button onclick="setPhaseFilter('ALL')"    class="filter-btn">All phases</button>
+                                    <button onclick="setPhaseFilter('A')"      class="filter-btn">Phase A</button>
+                                    <button onclick="setPhaseFilter('B')"      class="filter-btn">Phase B</button>
+                                    <button onclick="setPhaseFilter('C')"      class="filter-btn">Phase C</button>
+                                    <button onclick="setLayerFilter('BOTH')"   class="filter-btn">Top+Bottom</button>
+                                    <button onclick="setLayerFilter('TOP')"    class="filter-btn">Top only</button>
+                                    <button onclick="setLayerFilter('BOTTOM')" class="filter-btn">Bottom only</button>
+                                </div>
+                            </div>
+
+                            <!-- Table diagram -->
+                            <div id="tableDiagram" class="diagram-content">
+                                <div style="overflow-x: auto;">
+                                    <table id="windingTable"></table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div> <!-- calculator-main -->
+            </div> <!-- calculator-content -->
+        </div> <!-- calculator-container -->
+    </div> <!-- calculator page -->
+
+    <!-- Guide Page -->
+    <div id="guide" class="page">
+        <div class="guide-container">
+            <div class="guide-header">
+                <h2>Winding Theory Guide</h2>
+                <p>Understanding the fundamental concepts of AC machine winding allows for better model design and efficiency optimization.</p>
+            </div>
+
+            <div class="guide-section">
+                <h3>Fundamental Parameters</h3>
+                <div class="params-grid">
+                    <div class="param-box">
+                        <h4>Slots per Pole per Phase (q)</h4>
+                        <div class="formula">q = Z / (2p × m)</div>
+                        <p>Represents the number of slots occupied by one phase under one pole. Can be integer or fractional, affecting winding distribution and performance.</p>
+                    </div>
+
+                    <div class="param-box">
+                        <h4>Pole Pitch (τ)</h4>
+                        <div class="formula">τ = Z / 2p</div>
+                        <p>The distance between two consecutive poles measured in slots. Fundamental for determining coil span and winding layout.</p>
+                    </div>
+
+                    <div class="param-box">
+                        <h4>Coil Pitch (y)</h4>
+                        <div class="formula">y ≤ τ</div>
+                        <p>Distance between the two sides of a coil. Full pitch: y = τ. Short pitch: y &lt; τ. Short pitching reduces harmonics and copper usage.</p>
+                    </div>
+
+                    <div class="param-box">
+                        <h4>Electrical Angle (α)</h4>
+                        <div class="formula">α = 360°p / Z</div>
+                        <p>Electrical angle between two consecutive slots. Essential for calculating distribution factor and understanding EMF phasor relationships.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="guide-section">
+                <h3>Winding Factors</h3>
+                <div class="params-grid">
+                    <div class="param-box">
+                        <h4>Pitch Factor (Kp)</h4>
+                        <div class="formula">Kp = sin(β × 90°)</div>
+                        <p>Where β = y/τ. Accounts for the reduction in EMF due to short pitching. Kp = 1 for full pitch, Kp &lt; 1 for short pitch. Reduces harmonic content.</p>
+                    </div>
+
+                    <div class="param-box">
+                        <h4>Distribution Factor (Kd)</h4>
+                        <div class="formula">Kd = sin(qα/2) / (q × sin(α/2))</div>
+                        <p>Accounts for EMF reduction when coils are distributed across multiple slots instead of concentrated. Always Kd ≤ 1.</p>
+                    </div>
+
+                    <div class="param-box">
+                        <h4>Winding Factor (Kw)</h4>
+                        <div class="formula">Kw = Kp × Kd</div>
+                        <p>Overall factor representing the effectiveness of the winding. Higher Kw means better EMF utilization. Typically 0.85–0.96 for practical designs.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="guide-section">
+                <h3>Frequently Asked Questions</h3>
+
+                <div class="faq-item">
+                    <h4>What is the difference between full pitch and short pitch winding?</h4>
+                    <p>Full pitch winding has coil span equal to pole pitch (y = τ), maximizing fundamental EMF. Short pitch winding has y &lt; τ, reducing harmonics, saving copper, and improving cooling, though with slightly reduced fundamental EMF.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>Why use fractional slot winding (fractional q)?</h4>
+                    <p>Fractional q provides more flexibility in design, reduces cogging torque, improves MMF waveform, and can result in lower vibration and noise.</p>
+                </div>
+
+                <div class="faq-item">
+                    <h4>How does double-layer winding differ from single-layer?</h4>
+                    <p>Double-layer winding places two coil sides in each slot (top and bottom), allowing more flexibility in coil pitch selection and better space utilization.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Full Theory Page (imported content) -->
+    <div id="theory-full" class="page">
+        <!-- your extra theory content goes here -->
+    </div>
+
+    <!-- Modal for info popups -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="closeModal()">×</button>
+            <div id="modalBody"></div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
