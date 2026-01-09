@@ -135,14 +135,19 @@
                                 <button class="tab-btn" onclick="showDiagram('table', this)">Table</button>
                             </div>
 <div class="animation-controls">
-    <button type="button" onclick="startWindingAnimation()">▶ Play</button>
-    <button type="button" onclick="pauseWindingAnimation()">⏸ Pause</button>
-    <button type="button" onclick="resetWindingAnimation()">⟲ Reset</button>
-    <label style="margin-left:10px;">
-        Speed:
-        <input type="range" id="animSpeed" min="0.2" max="2" step="0.2" value="1">
-    </label>
+  <button type="button" onclick="stepPrev()">⟵ Prev</button>
+  <button type="button" onclick="stepNext()">Next ⟶</button>
+
+  <button type="button" onclick="startWindingAnimation()">▶ Play</button>
+  <button type="button" onclick="pauseWindingAnimation()">⏸ Pause</button>
+  <button type="button" onclick="resetWindingAnimation()">⟲ Reset</button>
+
+  <label style="margin-left:10px;">
+    Speed:
+    <input type="range" id="animSpeed" min="0.2" max="2" step="0.2" value="1">
+  </label>
 </div>
+
 
                             <!-- Linear diagram -->
                             <div id="linearDiagram" class="diagram-content active">
@@ -159,6 +164,15 @@
                                     <button onclick="setLayerFilter('TOP')"    class="filter-btn">Top only</button>
                                     <button onclick="setLayerFilter('BOTTOM')" class="filter-btn">Bottom only</button>
                                 </div>
+                                  <!-- Zoom button -->
+    <button id="zoomBtn" class="zoom-btn">🔍 Zoom</button>
+</div>
+
+<!-- Modal for zoomed diagram -->
+<div id="diagramModal" class="diagram-modal">
+    <span class="close-modal">&times;</span>
+    <canvas id="linearDiagramZoom"></canvas>
+</div>
                             </div>
 
                             <!-- Circular diagram -->
